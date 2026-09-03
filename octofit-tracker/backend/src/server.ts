@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import type { Model } from 'mongoose'
+import cors from 'cors'
 
 import { Activity } from './models/Activity.js'
 import { Leaderboard } from './models/Leaderboard.js'
@@ -16,6 +17,7 @@ const apiBaseUrl = codespaceName
   ? `https://${codespaceName}-8000.app.github.dev`
   : `http://localhost:${port}`
 
+app.use(cors())
 app.use(express.json())
 
 app.get('/api/health', (_request, response) => {
