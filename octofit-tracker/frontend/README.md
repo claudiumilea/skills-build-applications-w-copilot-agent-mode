@@ -2,6 +2,8 @@
 
 React 19 presentation tier for the OctoFit Tracker multi-tier application.
 
+This frontend is part of the OctoFit Tracker multi-tier exercise workflow.
+
 ## Environment
 
 Define `VITE_CODESPACE_NAME` in `.env.local` when running in Codespaces:
