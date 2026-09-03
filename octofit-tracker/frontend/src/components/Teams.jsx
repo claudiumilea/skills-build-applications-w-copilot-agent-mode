@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { fetchCollection } from '../api.js'
+const teamsApiUrl = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/teams`
+  : 'http://localhost:8000/api/teams'
 
 function Teams() {
   const [teams, setTeams] = useState([])
@@ -9,10 +11,19 @@ function Teams() {
   useEffect(() => {
     let ignore = false
 
-    fetchCollection('teams')
+    fetch(teamsApiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch teams')
+        }
+
+        return response.json()
+      })
       .then((data) => {
+        const items = Array.isArray(data) ? data : data.results ?? []
+
         if (!ignore) {
-          setTeams(data)
+          setTeams(items)
           setStatus('ready')
         }
       })
