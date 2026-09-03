@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 const activitiesApiUrl = import.meta.env.VITE_CODESPACE_NAME
-  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/activities`
-  : 'http://localhost:8000/api/activities'
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/activities/`
+  : 'http://localhost:8000/api/activities/'
 
 function Activities() {
   const [activities, setActivities] = useState([])
@@ -20,7 +20,7 @@ function Activities() {
         return response.json()
       })
       .then((data) => {
-        const items = Array.isArray(data) ? data : data.results ?? []
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
 
         if (!ignore) {
           setActivities(items)

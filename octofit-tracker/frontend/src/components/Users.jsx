@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 const usersApiUrl = import.meta.env.VITE_CODESPACE_NAME
-  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/users`
-  : 'http://localhost:8000/api/users'
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/users/`
+  : 'http://localhost:8000/api/users/'
 
 function Users() {
   const [users, setUsers] = useState([])
@@ -20,7 +20,7 @@ function Users() {
         return response.json()
       })
       .then((data) => {
-        const items = Array.isArray(data) ? data : data.results ?? []
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
 
         if (!ignore) {
           setUsers(items)

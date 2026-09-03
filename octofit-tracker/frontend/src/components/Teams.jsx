@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 const teamsApiUrl = import.meta.env.VITE_CODESPACE_NAME
-  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/teams`
-  : 'http://localhost:8000/api/teams'
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/teams/`
+  : 'http://localhost:8000/api/teams/'
 
 function Teams() {
   const [teams, setTeams] = useState([])
@@ -20,7 +20,7 @@ function Teams() {
         return response.json()
       })
       .then((data) => {
-        const items = Array.isArray(data) ? data : data.results ?? []
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
 
         if (!ignore) {
           setTeams(items)

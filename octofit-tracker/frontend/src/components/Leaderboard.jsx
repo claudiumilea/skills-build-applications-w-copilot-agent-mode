@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 const leaderboardApiUrl = import.meta.env.VITE_CODESPACE_NAME
-  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard`
-  : 'http://localhost:8000/api/leaderboard'
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard/`
+  : 'http://localhost:8000/api/leaderboard/'
 
 function Leaderboard() {
   const [leaders, setLeaders] = useState([])
@@ -20,7 +20,7 @@ function Leaderboard() {
         return response.json()
       })
       .then((data) => {
-        const items = Array.isArray(data) ? data : data.results ?? []
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
 
         if (!ignore) {
           setLeaders(items)

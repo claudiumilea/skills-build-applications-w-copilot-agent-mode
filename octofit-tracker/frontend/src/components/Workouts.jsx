@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 const workoutsApiUrl = import.meta.env.VITE_CODESPACE_NAME
-  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/workouts`
-  : 'http://localhost:8000/api/workouts'
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/workouts/`
+  : 'http://localhost:8000/api/workouts/'
 
 function Workouts() {
   const [workouts, setWorkouts] = useState([])
@@ -20,7 +20,7 @@ function Workouts() {
         return response.json()
       })
       .then((data) => {
-        const items = Array.isArray(data) ? data : data.results ?? []
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
 
         if (!ignore) {
           setWorkouts(items)
