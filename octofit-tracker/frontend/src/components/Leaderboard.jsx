@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { fetchCollection } from '../api.js'
+const leaderboardApiUrl = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard/`
+  : 'http://localhost:8000/api/leaderboard/'
 
 function Leaderboard() {
   const [leaders, setLeaders] = useState([])
@@ -9,10 +11,19 @@ function Leaderboard() {
   useEffect(() => {
     let ignore = false
 
-    fetchCollection('leaderboard')
+    fetch(leaderboardApiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch leaderboard')
+        }
+
+        return response.json()
+      })
       .then((data) => {
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
+
         if (!ignore) {
-          setLeaders(data)
+          setLeaders(items)
           setStatus('ready')
         }
       })
