@@ -1,22 +1,69 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
-const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
-const workoutsApiUrl = codespaceName
-  ? `https://${codespaceName}-8000.app.github.dev/api/workouts`
-  : 'http://localhost:8000/api/workouts';
+const workoutsApiUrl = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/workouts/`
+  : 'http://localhost:8000/api/workouts/'
 
-export default function Workouts() {
-  const [workouts, setWorkouts] = useState([]);
+function Workouts() {
+  const [workouts, setWorkouts] = useState([])
+  const [status, setStatus] = useState('loading')
 
   useEffect(() => {
-    const loadWorkouts = async () => {
-      const response = await fetch(workoutsApiUrl);
-      const data = await response.json();
-      setWorkouts(Array.isArray(data) ? data : data.results ?? []);
-    };
+    let ignore = false
 
-    loadWorkouts();
-  }, []);
+    fetch(workoutsApiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch workouts')
+        }
 
-  return <div>{workouts.length} workouts loaded</div>;
+        return response.json()
+      })
+      .then((data) => {
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
+
+        if (!ignore) {
+          setWorkouts(items)
+          setStatus('ready')
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          setStatus('error')
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [])
+
+  return (
+    <section className="data-view">
+      <div className="section-heading">
+        <p className="eyebrow">Workouts</p>
+        <h2>Recommended plans</h2>
+      </div>
+      {status === 'loading' && <p className="state-message">Loading workouts...</p>}
+      {status === 'error' && <p className="state-message error">Unable to load workouts.</p>}
+      {status === 'ready' && (
+        <div className="card-grid">
+          {workouts.map((workout) => (
+            <article className="metric-card" key={workout._id ?? workout.title}>
+              <h3>{workout.title}</h3>
+              <p>{workout.recommendedForGoal}</p>
+              <dl>
+                <dt>Focus</dt>
+                <dd>{workout.focusArea}</dd>
+                <dt>Duration</dt>
+                <dd>{workout.durationMinutes} min</dd>
+              </dl>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  )
 }
+
+export default Workouts

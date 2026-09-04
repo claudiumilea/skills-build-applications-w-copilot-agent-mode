@@ -1,22 +1,67 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
-const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
-const leaderboardApiUrl = codespaceName
-  ? `https://${codespaceName}-8000.app.github.dev/api/leaderboard`
-  : 'http://localhost:8000/api/leaderboard';
+const leaderboardApiUrl = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard/`
+  : 'http://localhost:8000/api/leaderboard/'
 
-export default function Leaderboard() {
-  const [entries, setEntries] = useState([]);
+function Leaderboard() {
+  const [leaders, setLeaders] = useState([])
+  const [status, setStatus] = useState('loading')
 
   useEffect(() => {
-    const loadLeaderboard = async () => {
-      const response = await fetch(leaderboardApiUrl);
-      const data = await response.json();
-      setEntries(Array.isArray(data) ? data : data.results ?? []);
-    };
+    let ignore = false
 
-    loadLeaderboard();
-  }, []);
+    fetch(leaderboardApiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch leaderboard')
+        }
 
-  return <div>{entries.length} leaderboard entries loaded</div>;
+        return response.json()
+      })
+      .then((data) => {
+        const items = Array.isArray(data) ? data : data.data ?? data.results ?? []
+
+        if (!ignore) {
+          setLeaders(items)
+          setStatus('ready')
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          setStatus('error')
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [])
+
+  return (
+    <section className="data-view">
+      <div className="section-heading">
+        <p className="eyebrow">Leaderboard</p>
+        <h2>Weekly standings</h2>
+      </div>
+      {status === 'loading' && <p className="state-message">Loading leaderboard...</p>}
+      {status === 'error' && <p className="state-message error">Unable to load leaderboard.</p>}
+      {status === 'ready' && (
+        <div className="leader-list">
+          {leaders.map((leader) => (
+            <article className="leader-card" key={leader._id ?? leader.userEmail}>
+              <span className="rank">#{leader.rank}</span>
+              <div>
+                <h3>{leader.userEmail}</h3>
+                <p>{leader.activeMinutes} active minutes</p>
+              </div>
+              <strong>{leader.score}</strong>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  )
 }
+
+export default Leaderboard
