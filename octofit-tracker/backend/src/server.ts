@@ -2,6 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import type { Model } from 'mongoose'
 import cors from 'cors'
+import { rateLimit } from 'express-rate-limit'
 
 import { Activity } from './models/Activity.js'
 import { Leaderboard } from './models/Leaderboard.js'
@@ -19,6 +20,15 @@ const apiBaseUrl = codespaceName
 
 app.use(cors())
 app.use(express.json())
+app.use(
+  '/api',
+  rateLimit({
+    windowMs: 60 * 1000,
+    limit: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+  }),
+)
 
 app.get('/api/health', (_request, response) => {
   response.json({ status: 'ok', apiBaseUrl })
